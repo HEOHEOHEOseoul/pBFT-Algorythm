@@ -181,8 +181,8 @@ func (node *Node) Reply(msg *ReplyMsg) error {
 
 	// Client가 없으므로, 일단 Primary에게 보내는 걸로 처리.
 	send(node.NodeAddressTable[node.View.Primary]+"/reply", jsonMsg)
-	node.CurrentState = nil
-	node.CommittedMsgs = make([]*RequestMsg, 0)
+	// node.CurrentState = nil
+	// node.CommittedMsgs = make([]*RequestMsg, 0)
 	return nil
 }
 
@@ -285,6 +285,11 @@ func (node *Node) GetCommit(commitMsg *VoteMsg) error {
 		LogStage("Commit", true)
 		node.Reply(replyMsg)
 		LogStage("Reply", true)
+		node.CurrentState = nil
+		if !qq.IsEmpty() {
+
+			node.Next <- true
+		}
 		// node.CommittedMsgs = make([]*RequestMsg, 0)
 		// node.CurrentState.CurrentStage = 0
 
@@ -359,7 +364,7 @@ func (node *Node) dispatchMsg() {
 				// TODO: send err to ErrorChannel
 			}
 		case <-node.Next:
-			node.CurrentState = nil
+
 			node.MsgEntrance <- qq.Dequeue()
 		}
 	}

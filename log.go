@@ -26,7 +26,7 @@ func LogStage(stage string, isDone bool) {
 	if isDone {
 		fmt.Printf("[STAGE-DONE] %s\n", stage)
 		if stage == "Reply" {
-			fmt.Println(j)
+			fmt.Println("패닉 : ", j)
 
 		}
 	} else {

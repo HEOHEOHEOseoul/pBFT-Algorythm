@@ -47,10 +47,13 @@ func (server *Server) getReq(writer http.ResponseWriter, request *http.Request) 
 		fmt.Println(err)
 		return
 	}
-	if qq.IsEmpty() {
-		server.node.MsgEntrance <- &msg
-	} else {
+
+	if server.node.CurrentState != nil {
+		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@")
 		qq.Enqueue(&msg)
+	} else {
+		server.node.CurrentState = nil
+		server.node.MsgEntrance <- &msg
 	}
 
 }
