@@ -45,6 +45,8 @@ type Queue []interface{} //큐스택에 쌓기위함
 
 var qq Queue = Queue{}
 
+var freshman string
+
 const ResolvingTimeDuration = time.Millisecond * 1000 // 1 second.
 
 //큐가 비어있는지 확인하는 함수.
@@ -339,11 +341,12 @@ func (node *Node) selectNode() {
 					continue
 				}
 				buff := bytes.NewBuffer(doc)
-				time.Sleep(time.Millisecond * 200)
+				// time.Sleep(time.Millisecond * 200)
 				http.Post("http://"+url+"/getTable", "application/json", buff)
 				fmt.Println("NodeAddress Table Has been Updated")
-
 			}
+			http.Post("http://"+freshman+"/getView", "application/json",
+				bytes.NewBuffer([]byte(`{ "view" : "`+fmt.Sprint(node.View.ID)+`" }`)))
 		}
 	}
 }

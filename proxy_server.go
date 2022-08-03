@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
@@ -37,6 +38,16 @@ func (server *Server) setRoute() {
 	http.HandleFunc("/reply", server.getReply)    //Leader Node ==> Http Server 주소변경
 	http.HandleFunc("/addNode", server.addNode)   //노드어드레드테이블에 추가 요청 경로 - 리더노드만 받음
 	http.HandleFunc("/getTable", server.getTable) //리더노드가 각각 노드에게 nodeaddresstable 줄 때 쓰는 경로 - 리더 제외 나머지가 받음
+	http.HandleFunc("/getView", server.getView)
+}
+
+func (server *Server) getView(writer http.ResponseWriter, request *http.Request) {
+	var newView map[string]string
+
+	json.NewDecoder(request.Body).Decode(&newView)
+
+	newViewId, _ := strconv.ParseInt(newView["view"], 10, 64)
+	server.node.View.ID = newViewId
 }
 
 func (server *Server) getReq(writer http.ResponseWriter, request *http.Request) {
@@ -79,7 +90,7 @@ func (server *Server) addNode(writer http.ResponseWriter, request *http.Request)
 
 	server.node.NodeAddressTable[newNodeAddress.Port] =
 		newNodeAddress.Ip + ":" + newNodeAddress.Port
-
+	freshman = server.node.NodeAddressTable[newNodeAddress.Port]
 	doc, _ := json.Marshal(server.node.NodeAddressTable)
 	server.node.NewNodeAlarm <- doc
 	// func() {
